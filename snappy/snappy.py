@@ -34,7 +34,7 @@ class Snappy():
             # Raise the exception
             raise Exception(Consts.EXCEPTION_MESSAGE_INSTANCES_RETRIEVAL_FAILED.format(str(failed_instances)))
         
-    def snap_root(self, tags_specifications=None):
+    def snap_roots(self, tags_specifications=None):
         
         # Make root snapshots for each instances and return the list of output
         return [instance.snap_root(tags_specifications) for instance in self.instances]

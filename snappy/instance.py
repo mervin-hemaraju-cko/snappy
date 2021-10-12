@@ -66,15 +66,21 @@ class Instance:
         else:
             formated_tags_specs = []
 
+        # Create a snapshot description
+        if self.name != None:
+            snapshot_description = Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.name)
+        else:
+            snapshot_description = Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.private_ip)
+            
         # Create snapshot
         response = client.create_snapshot(
-            Description=Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.private_ip),
+            Description=snapshot_description,
             VolumeId=self.root_volume,
             TagSpecifications=formated_tags_specs
         )
         
         # Return the output
-        Consts.template_snapshot_output(response["SnapshotId"], self.name, self.root_volume)
+        return Consts.template_snapshot_output(response["SnapshotId"], self.name, self.root_volume)
 
     def snap_all(self, tags_specifications=None):
 
@@ -92,9 +98,15 @@ class Instance:
         else:
             formated_tags_specs = []
 
+        # Create a snapshot description
+        if self.name != None:
+            snapshot_description = Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.name)
+        else:
+            snapshot_description = Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.private_ip)
+
         # Create snapshots
         response = client.create_snapshots(
-            Description=Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.private_ip),
+            Description=snapshot_description,
             InstanceSpecification={
                 'InstanceId': self.id,
                 'ExcludeBootVolume': False
