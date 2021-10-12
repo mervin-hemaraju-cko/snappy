@@ -6,6 +6,7 @@ class Instance:
     def __init__(self, json) -> None:
 
         # Declare empty values 
+        self.id = json["InstanceId"]
         self.name = None
         self.private_ip = None
         self.root_volume = None
@@ -67,13 +68,13 @@ class Instance:
 
         # Create snapshot
         response = client.create_snapshot(
-            Description=f'Snapshot for {self.private_ip}',
+            Description=Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.private_ip),
             VolumeId=self.root_volume,
             TagSpecifications=formated_tags_specs
         )
         
-        # Return the snapshot ID
-        return response["SnapshotId"]
+        # Return the output
+        Consts.template_snapshot_output(response["SnapshotId"], self.name, self.root_volume)
 
     def snap_all(self, tags_specifications=None):
 
@@ -91,23 +92,18 @@ class Instance:
         else:
             formated_tags_specs = []
 
-        # Create empty list of snapshot IDs
-        snapshot_ids = []
-
         # Create snapshots
-        for id in self.volumes:
-            # Create snapshot
-            response = client.create_snapshot(
-                Description=f'Snapshot for {self.private_ip}',
-                VolumeId=id,
-                TagSpecifications=formated_tags_specs
-            )
-
-            # Append ID to list
-            snapshot_ids.append(response["SnapshotId"])
+        response = client.create_snapshots(
+            Description=Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.private_ip),
+            InstanceSpecification={
+                'InstanceId': self.id,
+                'ExcludeBootVolume': False
+            },
+            TagSpecifications=formated_tags_specs
+        )
         
         # Return the snapshot ID list
-        return snapshot_ids
+        return response["Snapshots"]
 
 
             
