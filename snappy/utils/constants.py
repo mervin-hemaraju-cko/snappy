@@ -13,11 +13,17 @@ def template_snapshot_output(snapshot_id, for_instance, volume_id):
         "VolumeID": volume_id,
     }
 
-def filter_boto3_instance_retrieval(instances):
+def filter_boto3_template_ip(instances):
     return [{
-                'Name': 'private-ip-address',
-                'Values': instances,
-            }]
+        'Name': 'private-ip-address',
+        'Values': instances,
+    }]
+
+def filter_boto3_template_hostname(hostname):
+    return [{
+        'Name': 'tag:Name',
+        'Values': hostname,
+    }]
     
 ######################################
 ############## MESSAGES ##############
