@@ -1,5 +1,5 @@
 import pytest
-from snappy.utils.helper import has_errors, retrieve_failed_instances, is_an_ip_address, organize_instances
+from snappy.utils.helper import retrieve_failed_instances, is_an_ip_address, organize_instances, remove_duplicate_instances
 
 
 ###########################
@@ -12,27 +12,7 @@ class MyInstanceT:
         self.name = name
         
 class TestHelper:
-    
-    testdata = [
-        (["X","X","X"], ["X","X"], True),
-        (["X"], [], True),
-        ([], ["X"], True),
-        (["X","X","X"], ["X","X","X"], False),
-        (["X"], ["X"], False),
-        ([], [], False),
-    ]
-    @pytest.mark.parametrize("previous_instances,retrieved_instances,expected_result", testdata)
-    def test_has_errors(self, previous_instances, retrieved_instances, expected_result):
         
-        # Arrange
-        
-        # Act
-        result = has_errors(previous_instances, retrieved_instances)
-        
-        # Assert
-        assert expected_result == result
-    
-    
     testdata = [
         (
             ["10.10.10.1", "10.10.10.2","10.10.10.3", "10.10.10.4"], 
@@ -123,3 +103,23 @@ class TestHelper:
         # Assert
         assert expected_ips == result_ips
         assert expected_hostnames == result_hostnames
+        
+    testdata = [
+        (
+            [MyInstanceT("1.1.1.1", ""),MyInstanceT("1.1.1.2", ""),MyInstanceT("1.1.1.1", ""),MyInstanceT("1.1.1.2", "")], 
+            [MyInstanceT("1.1.1.1", ""),MyInstanceT("1.1.1.2", "")]
+        ),
+        ([MyInstanceT("1.1.1.1", ""),MyInstanceT("1.1.1.2", ""),MyInstanceT("1.1.1.1", ""),MyInstanceT("1.1.1.2", ""),MyInstanceT("1.1.1.2", "")], [MyInstanceT("1.1.1.1", ""),MyInstanceT("1.1.1.2", "")]),
+        ([MyInstanceT("1.1.1.1", ""),MyInstanceT("1.1.1.2", ""),MyInstanceT("1.1.1.2", ""),MyInstanceT("1.1.1.2", "")], [MyInstanceT("1.1.1.1", ""),MyInstanceT("1.1.1.2", "")]),
+        ([MyInstanceT("1.1.1.2", ""),MyInstanceT("1.1.1.2", ""),MyInstanceT("1.1.1.2", "")], [MyInstanceT("1.1.1.2", "")]),
+        ([MyInstanceT("1.1.1.1", ""),MyInstanceT("1.1.1.2", ""),MyInstanceT("1.1.1.3", "")], [MyInstanceT("1.1.1.1", ""),MyInstanceT("1.1.1.2", ""),MyInstanceT("1.1.1.3", "")]),
+    ]
+    @pytest.mark.parametrize("test_data,expected_result", testdata)
+    def test_remove_duplicate_instances(self,test_data, expected_result):
+        
+        # Act
+        result = remove_duplicate_instances(test_data)
+        
+        # Assert
+        assert [r.private_ip for r in result] == [er.private_ip for er in expected_result]
+        assert len(result) == len(expected_result)

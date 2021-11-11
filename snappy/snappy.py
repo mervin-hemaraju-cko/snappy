@@ -45,14 +45,16 @@ class Snappy():
                     self.instances.append(Instance(i))
                     
         
-        # Verify if all instances were retrieved successfully
-        if Helper.has_errors(instances, self.instances):
-            
-            # Retrieve the failing instances
-            failed_instances = Helper.retrieve_failed_instances(instances, self.instances)
-            
+        # Retrieve instances that were unable to fetch
+        failed_instances = Helper.retrieve_failed_instances(instances, self.instances)
+        
+        # Check if there are failed instances
+        if failed_instances:
             # Raise the exception
             raise Exception(Consts.EXCEPTION_MESSAGE_INSTANCES_RETRIEVAL_FAILED.format(str(failed_instances)))
+        
+        # Remove duplicate instances
+        self.instances = Helper.remove_duplicate_instances(self.instances)
         
     def snap_roots(self, tags_specifications=None):
         # Make root snapshots for each instances and return the list of output

@@ -1,11 +1,9 @@
 import re
 
-def has_errors(previous_instances, retrieved_instances):
-    
-    # Check if some instances were not retrieved
-    return len(previous_instances) != len(retrieved_instances)
-
 def retrieve_failed_instances(previous_instances, retrieved_instances):
+    
+    # Definition of failed instances
+    failed_instances = []
     
     # Organize previous instances
     previous_ip_addresses, previous_hostnames = organize_instances(previous_instances)
@@ -14,10 +12,15 @@ def retrieve_failed_instances(previous_instances, retrieved_instances):
     retrieved_ip_addresses = [instance.private_ip for instance in retrieved_instances]
     retrieved_hostnames = [instance.name for instance in retrieved_instances]
     
-    return (
-        [ip for ip in previous_ip_addresses if ip not in retrieved_ip_addresses] + 
-        [hostname for hostname in previous_hostnames if hostname not in retrieved_hostnames]
-    )
+    failed_instances = failed_instances + [instance for instance in previous_ip_addresses if (instance not in retrieved_ip_addresses and instance not in retrieved_hostnames)]
+    failed_instances = failed_instances + [instance for instance in previous_hostnames if (instance not in retrieved_ip_addresses and instance not in retrieved_hostnames)]
+    
+    return failed_instances
+
+    # return (
+    #     [ip for ip in previous_ip_addresses if ip not in retrieved_ip_addresses] + 
+    #     [hostname for hostname in previous_hostnames if hostname not in retrieved_hostnames]
+    # )
 
 def is_an_ip_address(data):
     # Checks whether a given string
@@ -28,3 +31,17 @@ def is_an_ip_address(data):
 def organize_instances(instances_raw):
     # Return ip_addresses, hostnames
     return [ip for ip in instances_raw if is_an_ip_address(ip)], [hostname for hostname in instances_raw if not is_an_ip_address(hostname)]
+
+def remove_duplicate_instances(instances):
+    
+    # Remove duplicates in list of instances
+    new_list = []
+    
+    for instance in instances:
+        
+        is_present = any(x.private_ip == instance.private_ip for x in new_list)
+
+        if not is_present:
+            new_list.append(instance)
+    
+    return new_list
