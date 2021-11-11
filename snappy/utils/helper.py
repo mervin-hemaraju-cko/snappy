@@ -1,5 +1,13 @@
 import re
 
+from datetime import date
+
+def format_today():
+    # This function returns today's date
+    # in the following format YYYYMMDD
+    today = date.today()
+    return today.strftime("%Y%m%d")
+
 def retrieve_failed_instances(previous_instances, retrieved_instances):
     
     # Definition of failed instances
@@ -16,11 +24,6 @@ def retrieve_failed_instances(previous_instances, retrieved_instances):
     failed_instances = failed_instances + [instance for instance in previous_hostnames if (instance not in retrieved_ip_addresses and instance not in retrieved_hostnames)]
     
     return failed_instances
-
-    # return (
-    #     [ip for ip in previous_ip_addresses if ip not in retrieved_ip_addresses] + 
-    #     [hostname for hostname in previous_hostnames if hostname not in retrieved_hostnames]
-    # )
 
 def is_an_ip_address(data):
     # Checks whether a given string

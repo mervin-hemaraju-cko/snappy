@@ -1,5 +1,6 @@
 import boto3
 import snappy.utils.constants as Consts
+from snappy.utils import helper as Helper
 
 class Instance:
 
@@ -55,26 +56,33 @@ class Instance:
         # Create EC2 client 
         client = boto3.client('ec2')
 
+        # Define Mandatory Tags
+        mandatory_tags = [Consts.template_snapshot_tag_timestamp(Helper.format_today(), self.name)]
+        
         # Reformat tags scpefications
         if tags_specifications != None and tags_specifications != []:
+            
+            # Add passed tags
+            mandatory_tags = mandatory_tags + tags_specifications
+            
             formated_tags_specs = [
                 {
                     'ResourceType': 'snapshot',
-                    'Tags': tags_specifications
+                    'Tags': mandatory_tags
                 },
             ]
+            
         else:
-            formated_tags_specs = []
-
-        # Create a snapshot description
-        if self.name != None:
-            snapshot_description = Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.name)
-        else:
-            snapshot_description = Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.private_ip)
+            formated_tags_specs = [
+                {
+                    'ResourceType': 'snapshot',
+                    'Tags': mandatory_tags
+                },
+            ]
             
         # Create snapshot
         response = client.create_snapshot(
-            Description=snapshot_description,
+            Description=Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.name) if self.name != None else Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.private_ip),
             VolumeId=self.root_volume,
             TagSpecifications=formated_tags_specs
         )

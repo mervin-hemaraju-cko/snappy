@@ -6,6 +6,13 @@
 #################################################
 ############## TEMPLATES & FILTERS ##############
 #################################################
+
+def template_snapshot_tag_timestamp(date, name):
+    return {
+        "Key": "Name",
+        "Value": f"{date}_{name}_snapshot"
+    }
+    
 def template_snapshot_output(snapshot_id, for_instance, volume_id):
     return {
         "SnapshotID": snapshot_id,

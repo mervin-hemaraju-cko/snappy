@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as rm:
 
 setup(
     name="aws-snappy",
-    version="0.2",
+    version="0.3",
     author="Mervin Hemaraju",
     author_email="mervin.hemaraju@checkout.com",
     description="Snappy is a Python library that facilitates taking root volume snapshots as well as non root volume snapshot from an instance.",

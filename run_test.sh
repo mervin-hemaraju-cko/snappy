@@ -9,4 +9,4 @@ pytest -v
 #pytest -v tests/test_api.py
 
 # Single function
-#pytest -v tests/test_api.py::TestApi::test_close_task
+#pytest -v tests/test_snappy.py::TestSnappy::test_snappy_snap_roots
