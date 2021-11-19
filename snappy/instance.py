@@ -9,40 +9,29 @@ class Instance:
         # Declare empty values 
         self.id = json["InstanceId"]
         self.name = None
-        self.private_ip = None
+        self.private_ip = json["PrivateIpAddress"] if "PrivateIpAddress" in json else None # Retrieve the IP Address
         self.root_volume = None
         self.volumes = None
 
         # Retrieve instance name
         if "Tags" in json:
-
-            for tag in json["Tags"]:
-
-                if(tag["Key"].lower() == "name"):
-
-                    self.name = tag["Value"]
-        
-        # Retrieve IP Address
-        if "PrivateIpAddress" in json:
-
-            self.private_ip = json["PrivateIpAddress"]
-
-
-        # Retrieve volume IDs
+            self.name = [tag["Value"] for tag in json["Tags"] if tag["Key"] == "Name"][0] if "Name" in [tag["Key"] for tag in json["Tags"]] else None
 
         # Check if volumes exists before continuing
         if "BlockDeviceMappings" not in json:
             raise Exception(Consts.EXCEPTION_MESSAGE_VOLUMES_NOT_FOUND.format(self.private_ip))
 
-        # Get the root volume device name
+        # Check if root device is present
         if "RootDeviceName" in json:
+            
+            # Get the root volume device name
             root_volume_device_name = json["RootDeviceName"]
 
             # Filter the root volume ID
             root_volume_data = next((filter(lambda t: t["DeviceName"] == root_volume_device_name, json["BlockDeviceMappings"])), None)
         
-            if root_volume_data is not None:
-                self.root_volume = root_volume_data["Ebs"]["VolumeId"]
+            # Retrieve the root_volume name if not None
+            self.root_volume = root_volume_data["Ebs"]["VolumeId"] if root_volume_data is not None else None
 
         # Get all volume IDs
         self.volumes = [volume["Ebs"]["VolumeId"] for volume in json["BlockDeviceMappings"]]
@@ -62,9 +51,10 @@ class Instance:
         # Reformat tags scpefications
         if tags_specifications != None and tags_specifications != []:
             
-            # Add passed tags
+            # Add user defined tags to mandatory tags
             mandatory_tags = mandatory_tags + tags_specifications
             
+            # Re format tags to the specifications
             formated_tags_specs = [
                 {
                     'ResourceType': 'snapshot',
@@ -90,45 +80,4 @@ class Instance:
         # Return the output
         return Consts.template_snapshot_output(response["SnapshotId"], self.name, self.root_volume)
 
-    def snap_all(self, tags_specifications=None):
-
-        # Create EC2 client 
-        client = boto3.client('ec2')
-
-        # Reformat tags scpefications
-        if tags_specifications != None and tags_specifications != []:
-            formated_tags_specs = [
-                {
-                    'ResourceType': 'snapshot',
-                    'Tags': tags_specifications
-                },
-            ]
-        else:
-            formated_tags_specs = []
-
-        # Create a snapshot description
-        if self.name != None:
-            snapshot_description = Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.name)
-        else:
-            snapshot_description = Consts.MESSAGE_DESCRIPTION_SNAPSHOT.format(self.private_ip)
-
-        # Create snapshots
-        response = client.create_snapshots(
-            Description=snapshot_description,
-            InstanceSpecification={
-                'InstanceId': self.id,
-                'ExcludeBootVolume': False
-            },
-            TagSpecifications=formated_tags_specs
-        )
-        
-        # Return the snapshot ID list
-        return response["Snapshots"]
-
-
-            
-
-
-
-
-        
+    

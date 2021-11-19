@@ -45,34 +45,6 @@ class TestInstance:
     #     print(f"test_snap_root_NoTagsSpecifications2Of2: {snapshot}")
 
     #     assert False
-    
-    # Uncomment to perform snapshot test
-    # def test_snap_all_NormalValues(self):
-    #     # Arrange
-    #     instance_json = json.load(open("tests/test_data/test_data_instance_for_snapshot_01.json"))
-    #     tags_specifications = [{
-    #         "Key": "CreatorName",
-    #         "Value": "mervin.hemaraju@checkout.com"
-    #     }]
-
-    #     # Act
-    #     instance = Instance(instance_json)
-    #     snapshots = instance.snap_all(tags_specifications)
-    #     print(f"test_snap_all_NormalValues: {snapshots}")
-
-    #     assert False
-
-    # Uncomment to perform snapshot test
-    # def test_snap_all_NoTagsSpecifications(self):
-    #     # Arrange
-    #     instance_json = json.load(open("tests/test_data/test_data_instance_for_snapshot_02.json"))
-
-    #     # Act
-    #     instance = Instance(instance_json)
-    #     snapshots = instance.snap_all()
-    #     print(f"test_snap_all_NoTagsSpecifications: {snapshots}")
-
-    #     assert False
 
     def test_load_instance_NoTagsDefined(self):
         # Arrange
